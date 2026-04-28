@@ -58,3 +58,9 @@ Portions of this project were developed with assistance from
 Claude (Anthropic, claude.ai), accessed April 2026, for schema
 design, query templates, and Flask scaffolding. All code was
 reviewed and adapted manually by the team.
+## Data Files
+Sample data files (500 rows each) are included in the data/ folder.
+Full datasets can be downloaded from:
+- CFPB: https://www.consumerfinance.gov/data-research/consumer-complaints/
+- OSHA: https://enforcement.osha.gov/data
+- SEC EDGAR: https://www.sec.gov/cgi-bin/browse-edgar
