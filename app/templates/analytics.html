@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mb-4">Analytics</h2>
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card p-3">
+            <h5>Top 10 Companies by Complaint Volume</h5>
+            <canvas id="complaintChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card p-3">
+            <h5>Total OSHA Penalties by State</h5>
+            <canvas id="penaltyChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card p-3">
+            <h5>Complaints by Product Type</h5>
+            <canvas id="productChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card p-3">
+            <h5>Top 10 Companies by Risk Score</h5>
+            <canvas id="riskChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-12 mb-4">
+        <div class="card p-3">
+            <h5>Complaint Volume Over Time</h5>
+            <canvas id="timelineChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+const complaintData = {{ complaint_data | tojson }};
+const penaltyData   = {{ penalty_data   | tojson }};
+const productData   = {{ product_data   | tojson }};
+const riskData      = {{ risk_data      | tojson }};
+const timelineData  = {{ timeline_data  | tojson }};
+
+new Chart(document.getElementById("complaintChart"), {
+    type: "bar",
+    data: {
+        labels: complaintData.map(d => d.company.substring(0, 20)),
+        datasets: [{ label: "Complaints",
+            data: complaintData.map(d => d.count),
+            backgroundColor: "#1e4d78" }]
+    },
+    options: { indexAxis: "y", plugins: { legend: { display: false } } }
+});
+
+new Chart(document.getElementById("penaltyChart"), {
+    type: "bar",
+    data: {
+        labels: penaltyData.map(d => d.state),
+        datasets: [{ label: "Total Penalty ($)",
+            data: penaltyData.map(d => d.total_penalty),
+            backgroundColor: "#a01c1c" }]
+    },
+    options: { plugins: { legend: { display: false } } }
+});
+
+new Chart(document.getElementById("productChart"), {
+    type: "doughnut",
+    data: {
+        labels: productData.map(d => d.product),
+        datasets: [{
+            data: productData.map(d => d.count),
+            backgroundColor: ["#1e4d78","#1e7a3a","#b85c00",
+                              "#a01c1c","#5b2d8e","#007a7a","#444","#888"]
+        }]
+    }
+});
+
+new Chart(document.getElementById("riskChart"), {
+    type: "bar",
+    data: {
+        labels: riskData.map(d => d.company.substring(0, 20)),
+        datasets: [{ label: "Risk Score",
+            data: riskData.map(d => d.score),
+            backgroundColor: riskData.map(d =>
+                d.score >= 75 ? "#a01c1c" :
+                d.score >= 50 ? "#b85c00" : "#1e4d78"
+            )}]
+    },
+    options: {
+        indexAxis: "y",
+        plugins: { legend: { display: false } },
+        scales: { x: { max: 100 } }
+    }
+});
+
+new Chart(document.getElementById("timelineChart"), {
+    type: "line",
+    data: {
+        labels: timelineData.map(d => d.year),
+        datasets: [{ label: "Complaints",
+            data: timelineData.map(d => d.count),
+            borderColor: "#1e4d78",
+            backgroundColor: "rgba(30,77,120,0.1)",
+            fill: true, tension: 0.3 }]
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Companies</h2>
+    <a href="/companies/add" class="btn btn-primary">+ Add Company</a>
+</div>
+<div class="card p-3">
+    <table class="table table-hover">
+        <thead>
+            <tr><th>Name</th><th>Ticker</th><th>SIC</th><th>State</th>
+                <th>Complaints</th><th>Violations</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+            {% for c in companies %}
+            <tr>
+                <td><a href="/companies/{{ c.name }}">{{ c.name }}</a></td>
+                <td>{{ c.ticker or "—" }}</td>
+                <td>{{ c.sic_code }}</td>
+                <td>{{ c.state }}</td>
+                <td>{{ c.complaint_count }}</td>
+                <td>{{ c.violation_count }}</td>
+                <td>
+                    <a href="/companies/{{ c.name }}"
+                    class="btn btn-sm btn-outline-primary">Details</a>
+                    <a href="/risk/{{ c.name }}"
+                    class="btn btn-sm btn-outline-danger">Risk</a>
+                    <form method="POST"
+                        action="/companies/delete/{{ c.name }}"
+                        style="display:inline"
+                        onsubmit="return confirm('Delete {{ c.name }}?')">
+                        <button class="btn btn-sm btn-outline-secondary">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

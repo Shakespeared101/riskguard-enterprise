@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mb-4">Add Company</h2>
+<div class="card p-4" style="max-width:600px">
+    <form method="POST">
+        <div class="mb-3">
+            <label class="form-label">Company Name</label>
+            <input type="text" name="name" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Ticker</label>
+            <input type="text" name="ticker" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">CIK</label>
+            <input type="text" name="cik" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">SIC Code</label>
+            <input type="text" name="sic_code" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">State</label>
+            <input type="text" name="state" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Fiscal Year End (MM-DD)</label>
+            <input type="text" name="fiscal_year_end"
+                   class="form-control" placeholder="12-31" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Company</button>
+        <a href="/companies" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+</div>
+{% endblock %}

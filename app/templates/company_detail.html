@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mb-4">{{ name }}</h2>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card p-3 mb-4">
+            <h5>Recent Complaints</h5>
+            <table class="table table-sm">
+                <thead><tr><th>Date</th><th>Product</th><th>Issue</th></tr></thead>
+                <tbody>
+                    {% for c in complaints %}
+                    <tr>
+                        <td>{{ c.date }}</td>
+                        <td>{{ c.product }}</td>
+                        <td>{{ c.issue }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-3 mb-4">
+            <h5>OSHA Violations</h5>
+            <table class="table table-sm">
+                <thead><tr><th>Date</th><th>Type</th><th>Penalty</th></tr></thead>
+                <tbody>
+                    {% for v in violations %}
+                    <tr>
+                        <td>{{ v.date }}</td>
+                        <td>{{ v.type }}</td>
+                        <td>${{ v.penalty }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<a href="/companies" class="btn btn-secondary">← Back</a>
+<a href="/companies/update/{{ name }}" class="btn btn-primary">Edit</a>
+<a href="/risk/{{ name }}" class="btn btn-danger">🔍 View Risk Profile</a>
+{% endblock %}

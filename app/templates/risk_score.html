@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Risk Profile: {{ name }}</h2>
+    <a href="/companies/{{ name }}" class="btn btn-outline-secondary">← Back</a>
+</div>
+
+{% if score %}
+<!-- Composite Score Badge -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card p-4 text-center">
+            <div class="text-muted mb-1">Composite Risk Score</div>
+            <div class="display-3 fw-bold
+                {% if score.composite > 75 %}text-danger
+                {% elif score.composite > 50 %}text-warning
+                {% else %}text-success{% endif %}">
+                {{ score.composite }}
+            </div>
+            <div class="text-muted small">out of 100</div>
+        </div>
+    </div>
+
+    <!-- Contributing Factors -->
+    <div class="col-md-9">
+        <div class="card p-4">
+            <h5 class="mb-3">Contributing Factors</h5>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <span>Complaint Risk
+                        <small class="text-muted">({{ score.complaint_count }} complaints)</small>
+                    </span>
+                    <span class="fw-bold">{{ score.complaint_risk }}/100</span>
+                </div>
+                <div class="progress mt-1" style="height:10px">
+                    <div class="progress-bar bg-primary"
+                         style="width:{{ score.complaint_risk }}%"></div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <span>Safety Risk
+                        <small class="text-muted">({{ score.violation_count }} violations)</small>
+                    </span>
+                    <span class="fw-bold">{{ score.safety_risk }}/100</span>
+                </div>
+                <div class="progress mt-1" style="height:10px">
+                    <div class="progress-bar bg-danger"
+                         style="width:{{ score.safety_risk }}%"></div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                    <span>Penalty Risk
+                        <small class="text-muted">(${{ score.total_penalty|int }} total)</small>
+                    </span>
+                    <span class="fw-bold">{{ score.financial_risk }}/100</span>
+                </div>
+                <div class="progress mt-1" style="height:10px">
+                    <div class="progress-bar bg-warning"
+                         style="width:{{ score.financial_risk }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h5>Complaints by Product Type</h5>
+            <canvas id="complaintBreakdown"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h5>Comparison with Top 10 Riskiest Companies</h5>
+            <canvas id="comparisonChart"></canvas>
+        </div>
+    </div>
+</div>
+
+{% if violation_breakdown %}
+<div class="card p-3 mb-4">
+    <h5>OSHA Violation Breakdown</h5>
+    <table class="table table-sm mt-2">
+        <thead>
+            <tr><th>Type</th><th>Count</th><th>Total Penalty</th></tr>
+        </thead>
+        <tbody>
+            {% for v in violation_breakdown %}
+            <tr>
+                <td>{{ v.type }}</td>
+                <td>{{ v.count }}</td>
+                <td>${{ v.penalty|int }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<script>
+const compBreakdown = {{ complaint_breakdown | tojson }};
+const comparison    = {{ comparison | tojson }};
+const thisCompany   = "{{ name }}";
+
+new Chart(document.getElementById("complaintBreakdown"), {
+    type: "doughnut",
+    data: {
+        labels: compBreakdown.map(d => d.product),
+        datasets: [{
+            data: compBreakdown.map(d => d.count),
+            backgroundColor: [
+                "#1e4d78","#1e7a3a","#b85c00",
+                "#a01c1c","#5b2d8e","#007a7a"
+            ]
+        }]
+    }
+});
+
+new Chart(document.getElementById("comparisonChart"), {
+    type: "bar",
+    data: {
+        labels: comparison.map(d => d.company.substring(0, 18)),
+        datasets: [{
+            label: "Risk Score",
+            data: comparison.map(d => d.score),
+            backgroundColor: comparison.map(d =>
+                d.company === thisCompany ? "#a01c1c" : "#1e4d78"
+            )
+        }]
+    },
+    options: {
+        indexAxis: "y",
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: ctx => `Score: ${ctx.raw}`
+                }
+            }
+        },
+        scales: { x: { max: 100 } }
+    }
+});
+</script>
+{% else %}
+<div class="alert alert-info">
+    No risk score computed for this company yet.
+    <a href="/analytics">Go to Analytics</a> to trigger computation.
+</div>
+{% endif %}
+{% endblock %}
